@@ -7,19 +7,13 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/mike-pech/purr-assign/cmd/api"
+	v1 "github.com/mike-pech/purr-assign/internal/delivery/http/v1"
 )
 
 var validate *validator.Validate
 
-type Server struct {
-}
-
-func NewServer() Server {
-	return Server{}
-}
-
 func main() {
-	server := NewServer()
+	server := v1.NewServer()
 
 	swagger, err := api.GetSwagger()
 	if err != nil {
