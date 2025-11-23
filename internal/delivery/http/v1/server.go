@@ -14,11 +14,13 @@ type HTTPError struct {
 
 type Server struct {
 	repository Repository
+	validator  echo.Validator
 }
 
-func NewServer(r Repository) Server {
+func NewServer(r Repository, v echo.Validator) Server {
 	return Server{
 		repository: r,
+		validator:  v,
 	}
 }
 
@@ -29,6 +31,16 @@ func (s Server) PostPullRequestCreate(ctx echo.Context) error {
 	if err != nil {
 		e := HTTPError{
 			Code: http.StatusBadRequest,
+			// TODO: Заменить сообщения ошибок
+			Message: "Error in PostPullRequestCreate: " + err.Error(),
+		}
+		return ctx.JSON(e.Code, &e)
+	}
+
+	err = s.validator.Validate(&pr)
+	if err != nil {
+		e := HTTPError{
+			Code: http.StatusUnprocessableEntity,
 			// TODO: Заменить сообщения ошибок
 			Message: "Error in PostPullRequestCreate: " + err.Error(),
 		}
@@ -104,6 +116,15 @@ func (s Server) PostTeamAdd(ctx echo.Context) error {
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusBadRequest,
+			Message: "Error in PostTeamAdd: " + err.Error(),
+		}
+		return ctx.JSON(e.Code, &e)
+	}
+
+	err = s.validator.Validate(&team)
+	if err != nil {
+		e := HTTPError{
+			Code:    http.StatusUnprocessableEntity,
 			Message: "Error in PostTeamAdd: " + err.Error(),
 		}
 		return ctx.JSON(e.Code, &e)

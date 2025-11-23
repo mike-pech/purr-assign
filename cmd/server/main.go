@@ -17,11 +17,22 @@ import (
 
 var validate *validator.Validate
 
+type Validator struct {
+	v *validator.Validate
+}
+
+// Подогнан под структуры данных
+func (v Validator) Validate(i any) error {
+	return v.v.Struct(i)
+}
+
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	v := Validator{v: validate}
 
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithDSN(os.Getenv("DSN")),
@@ -29,7 +40,7 @@ func main() {
 
 	repo := repository.NewBunRepository(sqldb)
 
-	server := v1.NewServer(repo)
+	server := v1.NewServer(repo, v)
 
 	swagger, err := api.GetSwagger()
 	if err != nil {
