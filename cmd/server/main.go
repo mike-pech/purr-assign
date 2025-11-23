@@ -9,7 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"github.com/mike-pech/purr-assign/cmd/api"
+	"github.com/mike-pech/purr-assign/cmd/api/v1"
 	v1 "github.com/mike-pech/purr-assign/internal/delivery/http/v1"
 	"github.com/mike-pech/purr-assign/internal/repository"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -29,7 +29,7 @@ func main() {
 
 	repo := repository.NewBunRepository(sqldb)
 
-	server := v1.NewServer(*repo)
+	server := v1.NewServer(repo)
 
 	swagger, err := api.GetSwagger()
 	if err != nil {

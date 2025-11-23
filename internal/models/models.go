@@ -3,14 +3,13 @@ package models
 import (
 	"time"
 
-	"github.com/mike-pech/purr-assign/cmd/api"
+	"github.com/mike-pech/purr-assign/cmd/api/v1"
 )
 
 type PullRequest struct {
-	// AssignedReviewers user_id назначенных ревьюверов (0..2)
 	PullRequestId     string                `json:"pull_request_id" bun:"id,pk"`
 	PullRequestName   string                `json:"pull_request_name" bun:"name,notnull"`
-	AuthorId          *User                 `json:"author_id" bun:"author_id,rel:belongs-to"`
+	AuthorId          string                `json:"author_id" bun:"author_id,rel:belongs-to"`
 	AssignedReviewers []string              `json:"assigned_reviewers" bun:"rel:has-many,join:id=users_id"`
 	CreatedAt         *time.Time            `json:"createdAt" bun:"created_at,nullzero,notnull,default:current_timestamp"`
 	MergedAt          *time.Time            `json:"mergedAt" bun:"merged_at,nullzero,notnull,default:current_timestamp"`

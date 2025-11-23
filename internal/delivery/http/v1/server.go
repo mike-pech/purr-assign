@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/mike-pech/purr-assign/cmd/api"
+	"github.com/mike-pech/purr-assign/cmd/api/v1"
 )
 
 type HTTPError struct {
@@ -35,19 +35,11 @@ func (s Server) PostPullRequestCreate(ctx echo.Context) error {
 		return ctx.JSON(e.Code, &e)
 	}
 
-	newPR, err := s.repository.CreatePullRequest(&pr)
+	newPR, err := s.repository.CreatePullRequest(ctx.Request().Context(), &pr)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusInternalServerError,
 			Message: "Error in CreatePullRequest: " + err.Error(),
-		}
-		return ctx.JSON(e.Code, &e)
-	}
-	newPR, err = s.repository.AssignPullRequest(newPR)
-	if err != nil {
-		e := HTTPError{
-			Code:    http.StatusInternalServerError,
-			Message: "Error in AssignPullRequest: " + err.Error(),
 		}
 		return ctx.JSON(e.Code, &e)
 	}
@@ -57,7 +49,7 @@ func (s Server) PostPullRequestCreate(ctx echo.Context) error {
 
 func (s Server) PostPullRequestMerge(ctx echo.Context) error {
 	id := ctx.Param("pull_request_id")
-	pr, err := s.repository.SetPullRequestMerged(id)
+	pr, err := s.repository.SetPullRequestMerged(ctx.Request().Context(), id)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusNotFound,
@@ -73,7 +65,7 @@ func (s Server) PostPullRequestReassign(ctx echo.Context) error {
 	id := ctx.Param("pull_request_id")
 	user := ctx.Param("old_user_id")
 
-	pr, err := s.repository.ReassignPullRequest(id, user)
+	pr, err := s.repository.ReassignPullRequest(ctx.Request().Context(), id, user)
 	if err != nil {
 		switch err.Error() {
 		case string(api.PRMERGED):
@@ -117,7 +109,7 @@ func (s Server) PostTeamAdd(ctx echo.Context) error {
 		return ctx.JSON(e.Code, &e)
 	}
 
-	newTeam, err := s.repository.SetTeam(&team)
+	newTeam, err := s.repository.SetTeam(ctx.Request().Context(), &team)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusInternalServerError,
@@ -131,7 +123,7 @@ func (s Server) PostTeamAdd(ctx echo.Context) error {
 
 func (s Server) GetTeamGet(ctx echo.Context, params api.GetTeamGetParams) error {
 	query := params.TeamName
-	teams, err := s.repository.FindTeam(query)
+	teams, err := s.repository.FindTeam(ctx.Request().Context(), query)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusNotFound,
@@ -146,7 +138,7 @@ func (s Server) GetTeamGet(ctx echo.Context, params api.GetTeamGetParams) error 
 func (s Server) GetUsersGetReview(ctx echo.Context, params api.GetUsersGetReviewParams) error {
 	id := params.UserId
 
-	prs, err := s.repository.FindPullRequestsOfUser(&id)
+	prs, err := s.repository.FindPullRequestsOfUser(ctx.Request().Context(), &id)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusInternalServerError,
@@ -170,7 +162,7 @@ func (s Server) PostUsersSetIsActive(ctx echo.Context) error {
 		return ctx.JSON(e.Code, &e)
 	}
 
-	user, err := s.repository.SetUserIsActive(&setIsActiveBody)
+	user, err := s.repository.SetUserIsActive(ctx.Request().Context(), &setIsActiveBody)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusInternalServerError,
