@@ -62,21 +62,17 @@ func main() {
 
 	server := v1.NewServer(repo, v)
 
-	swagger, err := api.GetSwagger()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	e := echo.New()
 	api.RegisterHandlers(e, server)
 
 	e.GET("/swagger/*", func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, swagger)
-	})
-	e.Pre(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(ctx echo.Context) error {
-			return ctx.Redirect(http.StatusMovedPermanently, "/swagger/doc.json")
+		swagger, err := api.GetSwagger()
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, map[string]string{
+				"error": "Failed to load Swagger spec: " + err.Error(),
+			})
 		}
+		return ctx.JSON(http.StatusOK, swagger)
 	})
 
 	log.Fatal(e.Start("0.0.0.0:8080"))
