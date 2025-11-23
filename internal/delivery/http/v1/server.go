@@ -35,7 +35,7 @@ func (s Server) PostPullRequestCreate(ctx echo.Context) error {
 		return ctx.JSON(e.Code, &e)
 	}
 
-	newPR, err := s.repository.CreatePullRequesst(&pr)
+	newPR, err := s.repository.CreatePullRequest(&pr)
 	if err != nil {
 		e := HTTPError{
 			Code:    http.StatusInternalServerError,

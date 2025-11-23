@@ -4,7 +4,7 @@ import "github.com/mike-pech/purr-assign/cmd/api"
 
 type Repository interface {
 	// Создать PR
-	CreatePullRequesst(*api.PullRequest) (*api.PullRequest, error)
+	CreatePullRequest(*api.PullRequest) (*api.PullRequest, error)
 	// Назначить ревьювера на PR
 	AssignPullRequest(*api.PullRequest) (*api.PullRequest, error)
 	// Пометить PR как MERGED (идемпотентная операция)
