@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"embed"
 	"log"
 	"net/http"
 	"os"
@@ -13,9 +14,15 @@ import (
 	v1 "github.com/mike-pech/purr-assign/internal/delivery/http/v1"
 	"github.com/mike-pech/purr-assign/internal/repository"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/migrate"
 )
 
-var validate *validator.Validate
+//go:embed migrations/*.sql
+var sqlMigrations embed.FS
+var (
+	validate   *validator.Validate
+	migrations = migrate.NewMigrations()
+)
 
 type Validator struct {
 	v *validator.Validate
@@ -37,6 +44,11 @@ func main() {
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
 		pgdriver.WithDSN(os.Getenv("DSN")),
 	))
+
+	err = migrations.Discover(sqlMigrations)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	repo := repository.NewBunRepository(sqldb)
 

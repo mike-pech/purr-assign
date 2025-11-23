@@ -13,7 +13,7 @@ type PullRequest struct {
 	AssignedReviewers []string              `json:"assigned_reviewers" bun:"rel:has-many,join:id=users_id"`
 	CreatedAt         *time.Time            `json:"createdAt" bun:"created_at,nullzero,notnull,default:current_timestamp"`
 	MergedAt          *time.Time            `json:"mergedAt" bun:"merged_at,nullzero,notnull,default:current_timestamp"`
-	Status            api.PullRequestStatus `json:"status" bun:"status,notnull"`
+	Status            api.PullRequestStatus `json:"status" bun:"status,notnull,default:OPEN"`
 }
 
 type Team struct {
