@@ -16,9 +16,9 @@ type Server struct {
 	repository Repository
 }
 
-func NewServer(r *Repository) Server {
+func NewServer(r Repository) Server {
 	return Server{
-		repository: *r,
+		repository: r,
 	}
 }
 
