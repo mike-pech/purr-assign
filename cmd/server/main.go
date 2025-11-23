@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"embed"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -42,7 +43,14 @@ func main() {
 	v := Validator{v: validate}
 
 	sqldb := sql.OpenDB(pgdriver.NewConnector(
-		pgdriver.WithDSN(os.Getenv("DSN")),
+		pgdriver.WithDSN(fmt.Sprintf(
+			"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_HOST"),
+			os.Getenv("POSTGRES_PORT"),
+			os.Getenv("POSTGRES_DB"),
+		)),
 	))
 
 	err = migrations.Discover(sqlMigrations)
